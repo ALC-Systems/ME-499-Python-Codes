@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+
+import csv
+
+
+def mean_filter(list):
+    newlist = []
+    width = 7
+    trim = (width-1)//2
+    lowerEnd = trim
+    upperEnd = len(list) - trim
+
+    for i in range(int(lowerEnd),int(upperEnd)):
+        section = list[(i - trim):(i+trim)]
+        from sum import sum_r                    # use own function for stuff
+        average = sum_r(section)/width
+        newlist.append(average)
+    return newlist
+
+
+
+# what do we do with first and last entries?? Or do you want corresponding length
+# independent variables??
+
+
+if __name__ == '__main__':
+
+    from sensor import generate_sensor_data   # takes one variable n, generates n numbers
+    #from null_filter import apply_null_filter # didnt need this
+    num = 100
+    data = []
+
+    for i in generate_sensor_data(num):
+        data.append(i)
+    independent = list(range(num))   # independent var for unfiltered data
+
+    filtered = mean_filter(data)
+    filteredx = list(range(len(filtered)))
+# plot
+    import matplotlib.pyplot as plt
+
+    plt.grid(True)
+    unfiltered, = plt.plot(independent, data, 'r--')
+
+    filteredData, = plt.plot(filteredx, filtered, 'b-')
+    plt.legend([unfiltered, filteredData], ['Unfiltered Data','Filtered Data'])
+    plt.show()
+
+    # write CSV
