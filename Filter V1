@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+
+
+def mean_filter(list):
+    newlist = []
+    for i in range (1,len(list)-1):
+        average = (list[i-1] + list [i+1] + list[i])/3
+        newlist.append(average)
+    return newlist
+
+
+
+# what do we do with first and last entries?? Or do you want corresponding length
+# independent variables??
+
+
+if __name__ == '__main__':
+
+    from sensor import generate_sensor_data   # takes one variable n, generates n numbers
+    #from null_filter import apply_null_filter # didnt need this
+    num = 100
+    data = []
+    independent = list(range(num))
+
+    for i in generate_sensor_data(num):
+        data.append(i)
+
+    filtered = mean_filter(data)
+    filteredx = list(range(len(filtered)))
+# plot
+    import matplotlib.pyplot as plt
+
+    plt.grid(True)
+    plt.plot(independent, data, 'r-')
+
+    plt.plot(filteredx, filtered, 'b--')
+
+    plt.show()
