@@ -1,0 +1,28 @@
+
+def integrate(f,a,b,numstep = 100):  # what should the default numstep be??? Setting it to 100
+
+    if type(a) != int and type(a) != float:
+        print('Use a number for a, not whatever you did!')
+        raise ValueError
+
+    if type(b) != int and type(b) != float:
+        print('Use a number for b, not whatever you did!')
+        raise ValueError
+
+    if type(numstep) != int and type(numstep) != float:
+        print('Use a number for numstep, not whatever you did!')
+        raise ValueError
+
+    sum = 0                       # placeholder for sum
+    stepsize = (b-a)/numstep      # calculate step size
+    area = []                     # empty array for area of rectangles
+    y = []                        # empty array for y values
+    x = np.linspace(a,b,numstep)  # x values
+    for i in x:
+        y.append(f(i))            # makes list of y values corresponding to x values
+        area.append(stepsize * f(i))
+
+    for i in area:
+        sum = sum + i              # sum all the areas
+
+    return sum
