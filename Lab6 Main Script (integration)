@@ -1,3 +1,35 @@
+#!/usr/bin/env python3
+
+import numpy as np, matplotlib.pyplot as plt, random
+
+def f(x):
+    return 0.25 * (x**4)
+
+# integrate function 2, MC function
+
+def integrate_mc(f,a,b,(c,d), numsample = 1000):
+    # a,b = bounds
+    # (c,d) is a tuple such that c is lower than lowest value of f and
+    # d is greater than the greatest in f
+    # numsample = number of samples, default is 1000
+
+    """why do you need the tuple (c,d)??????? Answer - it draws a bounding box. You need to
+     generate samples within the bounds of the dependent of the function. a,b specify the
+     left and right boundaries while c and d specify the lower and upper bloundaries.
+
+     But why???? I thought it was just f(x) * (b-a).
+
+    """
+
+    for i in range numsample:
+
+        x = random.uniform
+
+
+    return sumint
+
+
+# integrate function 1, Riemann Sums
 
 def integrate(f,a,b,numstep = 100):  # what should the default numstep be??? Setting it to 100
 
@@ -13,7 +45,7 @@ def integrate(f,a,b,numstep = 100):  # what should the default numstep be??? Set
         print('Use a number for numstep, not whatever you did!')
         raise ValueError
 
-    sum = 0                       # placeholder for sum
+    sumint = 0                       # placeholder for sum
     stepsize = (b-a)/numstep      # calculate step size
     area = []                     # empty array for area of rectangles
     y = []                        # empty array for y values
@@ -23,6 +55,20 @@ def integrate(f,a,b,numstep = 100):  # what should the default numstep be??? Set
         area.append(stepsize * f(i))
 
     for i in area:
-        sum = sum + i              # sum all the areas
+        sumint = sumint + i              # sum all the areas
 
-    return sum
+    return sumint
+
+
+# function for approx. pi
+#
+# def approximate_pi(n):
+#
+#     return approx
+
+
+if __name__ == '__main__':
+
+    sum1 = integrate(f,0,5)
+    print(sum1)
+
