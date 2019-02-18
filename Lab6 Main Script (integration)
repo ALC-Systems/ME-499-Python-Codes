@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import numpy as np, matplotlib.pyplot as plt, random
+import numpy as np, matplotlib.pyplot as plt, random, math
 from toolz import *            # is this ok???
 
 def f(x):
@@ -90,10 +90,32 @@ def integrate(f,a,b,numstep = 100):  # what should the default numstep be??? Set
 
 # function for approx. pi
 
-def approximate_pi(numsample):  # n is the number of samples used
+def approximate_pi(numsample = 1000):  # n is the number of samples used
 
+    area = 4
+    overx = []
+    overy = []
+    underx = []
+    undery = []
+    for i in range(0, numsample):
+        x1 = random.uniform(-1, 1)
+        y1 = random.uniform(-1, 1)
+        length = math.sqrt(x1**2 + y1**2)
+        if length >= 1:
+            overx.append(x1)
+            overy.append(y1)
 
+        else:
+            underx.append(x1)
+            undery.append(y1)
 
+    approx = area * len(underx) / numsample
+    # plot
+    plt.plot(overx, overy, 'ro')
+    plt.plot(underx, undery, 'bo')
+    plt.title('MC Unit Circle')
+    plt.grid(True)
+    # plt.show()
 
     return approx
 
@@ -112,40 +134,42 @@ if __name__ == '__main__':
     print('Monte Carlo integration result:', sum2)
 
 # plot results and errors:
-#     MC Error
+# MC Error
+    error1 = []
+    error2 = []
+    for i in range(100,5000):
+        mcsum = integrate_mc(f,0,5,(0,160),i)
+        error1.append(abs(mcsum - solution))
 
-    for i in range(100,50000):
-        mcsum = integrate_mc(f,0,5,(-10,160),i)
-        error = abs(mcsum - solution)
-        plt.plot(i,error,'ro')
-    plt.title('Monte Carlo Error vs # of Samples')
+# Riemann sum error
+    ind = []
+    for i in range(100, 5000):
+        ind.append(i)
+        rsum = integrate(f,0,5,i)
+        error2.append(abs(rsum - solution))
+
+
+    # plot
+    plt.plot(ind, error1, 'ro', label = "MC Error")
+    plt.plot(ind,error2,'bo', label = "Riemann Sum Error")
+    plt.title('Riemann Sum and MC Error vs # of Samples')
     plt.grid(True)
     plt.xlabel('Number of Samples')
     plt.ylabel('Error')
-
+    plt.legend()
     plt.show()
 
-
-# Riemann sum error
-#     ind = []
-#     for i in range(100, 1000):
-#         ind.append(i)
-#         rsum = integrate(f,0,5,i)
-#         error2 = abs(rsum - solution)
-#         plt.plot(i,error2,'bo')
-#     plt.title('Riemann Sum Error vs # of Samples')
-#     plt.grid(True)
-#     plt.xlabel('Number of Samples')
-#     plt.ylabel('Error')
+# plot function curve
+#     a = np.linspace(0, 5, 100)
+#     y = []
+#     for i in a:
+#         y.append(f(i))
 #
+#     plt.plot(a, y)  # plot x^4 / 4
+#     plt.grid(True)
 #     plt.show()
 
-# plot function curve
-    a = np.linspace(0, 5, 100)
-    y = []
-    for i in a:
-        y.append(f(i))
-
-    plt.plot(a, y)  # plot x^4 / 4
-    plt.grid(True)
-    # plt.show()
+# estimate pi
+#
+#     est = approximate_pi(100000)
+#     print('Monte Carlo estimate of pi:', est)
