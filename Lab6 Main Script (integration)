@@ -1,33 +1,61 @@
 #!/usr/bin/env python3
 
 import numpy as np, matplotlib.pyplot as plt, random
+from toolz import *            # is this ok???
 
 def f(x):
-    return 0.25 * (x**4)
+    return (x**3)
 
 # integrate function 2, MC function
 
-def integrate_mc(f,a,b,(c,d), numsample = 1000):
+def integrate_mc(f,a,b,sometuple, numsample = 1000):
+
     # a,b = bounds
     # (c,d) is a tuple such that c is lower than lowest value of f and
     # d is greater than the greatest in f
     # numsample = number of samples, default is 1000
+    #
+    # why do you need the tuple (c,d)??????? Answer - it draws a bounding box. You need to
+    #  generate samples within the bounds of the dependent of the function. a,b specify the
+    #  left and right boundaries while c and d specify the lower and upper bloundaries.
+    #
+    # now you need to find some points...throw out a point like (x1,y1). find f(x1). if y1 is
+    # above f(x1), append to "not under curve". if y1 is below f(x1), append to "under curve".
+    #
+    # put way more points in and(# pts under curve)/(# points above curve * area of rectangle)
+    # will be the area under the curve.
+    #
 
-    """why do you need the tuple (c,d)??????? Answer - it draws a bounding box. You need to
-     generate samples within the bounds of the dependent of the function. a,b specify the
-     left and right boundaries while c and d specify the lower and upper bloundaries.
+   # but again, why the fuck do you need (c,d)??????
+    c,d = sometuple
+    overx = []
+    overy = []
+    underx = []
+    undery = []
+    for i in range(0, numsample):
+        x1 = random.uniform(a, b)
+        y1 = random.uniform(c, d)
+        ys = f(x1)
 
-     But why???? I thought it was just f(x) * (b-a).
+        if y1 > ys or y1 == ys:
+            overx.append(x1)
+            overy.append(y1)
 
-    """
+        elif y1 < ys:
+            underx.append(x1)
+            undery.append(y1)
 
-    for i in range numsample:
+    area = abs(b - a) * abs(d - c)
 
-        x = random.uniform
+    under = area * len(underx) / numsample
 
+    # if you want a hot mess, uncomment these two lines:
 
-    return sumint
+    # plt.plot(overx, overy, 'ro')
+    # plt.plot(underx, undery, 'bo')
+    # plt.show()
 
+    return under
 
 # integrate function 1, Riemann Sums
 
@@ -61,14 +89,63 @@ def integrate(f,a,b,numstep = 100):  # what should the default numstep be??? Set
 
 
 # function for approx. pi
-#
-# def approximate_pi(n):
-#
-#     return approx
+
+def approximate_pi(numsample):  # n is the number of samples used
+
+
+
+
+    return approx
 
 
 if __name__ == '__main__':
 
-    sum1 = integrate(f,0,5)
-    print(sum1)
+    solution = 156.25
+# riemann sum
+    sum1 = integrate(f, 0, 5)
+    print('Riemann sum integration result:', sum1)
 
+# MC, between 0 and 5 0.25x^4 goes to just under 160. Use -10, 170 as the bounding box
+
+    sum2 = integrate_mc(f, 0, 5, (0, 200),5000)
+
+    print('Monte Carlo integration result:', sum2)
+
+# plot results and errors:
+#     MC Error
+
+    for i in range(100,50000):
+        mcsum = integrate_mc(f,0,5,(-10,160),i)
+        error = abs(mcsum - solution)
+        plt.plot(i,error,'ro')
+    plt.title('Monte Carlo Error vs # of Samples')
+    plt.grid(True)
+    plt.xlabel('Number of Samples')
+    plt.ylabel('Error')
+
+    plt.show()
+
+
+# Riemann sum error
+#     ind = []
+#     for i in range(100, 1000):
+#         ind.append(i)
+#         rsum = integrate(f,0,5,i)
+#         error2 = abs(rsum - solution)
+#         plt.plot(i,error2,'bo')
+#     plt.title('Riemann Sum Error vs # of Samples')
+#     plt.grid(True)
+#     plt.xlabel('Number of Samples')
+#     plt.ylabel('Error')
+#
+#     plt.show()
+
+# plot function curve
+    a = np.linspace(0, 5, 100)
+    y = []
+    for i in a:
+        y.append(f(i))
+
+    plt.plot(a, y)  # plot x^4 / 4
+    plt.grid(True)
+    # plt.show()
