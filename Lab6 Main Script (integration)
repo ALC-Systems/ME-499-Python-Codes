@@ -1,175 +1,29 @@
 #!/usr/bin/env python3
 
-import numpy as np, matplotlib.pyplot as plt, random, math
-from toolz import *            # is this ok???
+import numpy as np, matplotlib.pyplot as plt, random
 
-def f(x):
-    return (x**3)
-
-# integrate function 2, MC function
-
-def integrate_mc(f,a,b,sometuple, numsample = 1000):
-
-    # a,b = bounds
-    # (c,d) is a tuple such that c is lower than lowest value of f and
-    # d is greater than the greatest in f
-    # numsample = number of samples, default is 1000
-    #
-    # why do you need the tuple (c,d)??????? Answer - it draws a bounding box. You need to
-    #  generate samples within the bounds of the dependent of the function. a,b specify the
-    #  left and right boundaries while c and d specify the lower and upper bloundaries.
-    #
-    # now you need to find some points...throw out a point like (x1,y1). find f(x1). if y1 is
-    # above f(x1), append to "not under curve". if y1 is below f(x1), append to "under curve".
-    #
-    # put way more points in and(# pts under curve)/(# points above curve * area of rectangle)
-    # will be the area under the curve.
-    #
-
-   # but again, why the fuck do you need (c,d)??????
-    c,d = sometuple
-    overx = []
-    overy = []
-    underx = []
-    undery = []
-    for i in range(0, numsample):
-        x1 = random.uniform(a, b)
-        y1 = random.uniform(c, d)
-        ys = f(x1)
-
-        if y1 > ys or y1 == ys:
-            overx.append(x1)
-            overy.append(y1)
-
-        elif y1 < ys:
-            underx.append(x1)
-            undery.append(y1)
-
-    area = abs(b - a) * abs(d - c)
-
-    under = area * len(underx) / numsample
-
-    # if you want a hot mess, uncomment these two lines:
-
-    # plt.plot(overx, overy, 'ro')
-    # plt.plot(underx, undery, 'bo')
-    # plt.show()
-
-    return under
-
-# integrate function 1, Riemann Sums
-
-def integrate(f,a,b,numstep = 100):  # what should the default numstep be??? Setting it to 100
-
-    if type(a) != int and type(a) != float:
-        print('Use a number for a, not whatever you did!')
-        raise ValueError
-
-    if type(b) != int and type(b) != float:
-        print('Use a number for b, not whatever you did!')
-        raise ValueError
-
-    if type(numstep) != int and type(numstep) != float:
-        print('Use a number for numstep, not whatever you did!')
-        raise ValueError
-
-    sumint = 0                       # placeholder for sum
-    stepsize = (b-a)/numstep      # calculate step size
-    area = []                     # empty array for area of rectangles
-    y = []                        # empty array for y values
-    x = np.linspace(a,b,numstep)  # x values
-    for i in x:
-        y.append(f(i))            # makes list of y values corresponding to x values
-        area.append(stepsize * f(i))
-
-    for i in area:
-        sumint = sumint + i              # sum all the areas
-
-    return sumint
-
-
-# function for approx. pi
-
-def approximate_pi(numsample = 1000):  # n is the number of samples used
-
-    area = 4
-    overx = []
-    overy = []
-    underx = []
-    undery = []
-    for i in range(0, numsample):
-        x1 = random.uniform(-1, 1)
-        y1 = random.uniform(-1, 1)
-        length = math.sqrt(x1**2 + y1**2)
-        if length >= 1:
-            overx.append(x1)
-            overy.append(y1)
-
-        else:
-            underx.append(x1)
-            undery.append(y1)
-
-    approx = area * len(underx) / numsample
-    # plot
-    plt.plot(overx, overy, 'ro')
-    plt.plot(underx, undery, 'bo')
-    plt.title('MC Unit Circle')
-    plt.grid(True)
-    # plt.show()
-
-    return approx
+from integrate import f, integrate, integrate_mc
 
 
 if __name__ == '__main__':
 
-    solution = 156.25
 # riemann sum
     sum1 = integrate(f, 0, 5)
-    print('Riemann sum integration result:', sum1)
+    print(sum1)
 
-# MC, between 0 and 5 0.25x^4 goes to just under 160. Use -10, 170 as the bounding box
+# between 0 and 5 0.25x^4 goes to just under 160. Use -10, 170 as the bounding box
 
-    sum2 = integrate_mc(f, 0, 5, (0, 200),5000)
+    sum2 = integrate_mc(f, 0, 5, (-10, 160))
 
-    print('Monte Carlo integration result:', sum2)
+    print(sum2)
 
-# plot results and errors:
-# MC Error
-    error1 = []
-    error2 = []
-    for i in range(100,5000):
-        mcsum = integrate_mc(f,0,5,(0,160),i)
-        error1.append(abs(mcsum - solution))
+# plot curve
+    a = np.linspace(0, 5, 100)
+    y = []
+    for i in a:
+        y.append(f(i))
 
-# Riemann sum error
-    ind = []
-    for i in range(100, 5000):
-        ind.append(i)
-        rsum = integrate(f,0,5,i)
-        error2.append(abs(rsum - solution))
-
-
-    # plot
-    plt.plot(ind, error1, 'ro', label = "MC Error")
-    plt.plot(ind,error2,'bo', label = "Riemann Sum Error")
-    plt.title('Riemann Sum and MC Error vs # of Samples')
+    plt.plot(a, y)  # plot x^4 / 4
     plt.grid(True)
-    plt.xlabel('Number of Samples')
-    plt.ylabel('Error')
-    plt.legend()
+
     plt.show()
-
-# plot function curve
-#     a = np.linspace(0, 5, 100)
-#     y = []
-#     for i in a:
-#         y.append(f(i))
-#
-#     plt.plot(a, y)  # plot x^4 / 4
-#     plt.grid(True)
-#     plt.show()
-
-# estimate pi
-#
-#     est = approximate_pi(100000)
-#     print('Monte Carlo estimate of pi:', est)
