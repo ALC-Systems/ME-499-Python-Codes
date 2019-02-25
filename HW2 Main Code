@@ -1,6 +1,6 @@
 #!/usr/bin/env python3\
 
-# python D:\PythonScripts\499hw2\directory.py
+# python D:\PythonScripts\499hw2\directory.py nancy squires william smart kyle niemeyer
 import urllib.request, sys
 
 # returns the string from html
@@ -38,29 +38,50 @@ def makeurl():
         URL.append('http://directory.oregonstate.edu/?type=search&cn=' + first[i] + '+' + last[i])
 
     return URL
-if __name__ == '__main__':
-
-    listurl = makeurl()
-
-    content = getstring(listurl[1])  # get the string from html
+# function that stores each person's attributes and prints them
+def makedic(content):
 
     person = {}  # empty dictionary for dude
 
     for i, line in enumerate(content.split('<dd>')):
         if i == 1:  # name
-            name = line.split('</dd')[0]
+            person["name"] = line.split('</dd')[0]
         if i == 3:
-            title = line.split('</dd')[0]
+            person["title"] = line.split('</dd')[0]
         if i == 4:
-            dept = line.split('</dd')[0]
+            person["dept"] = line.split('</dd')[0]
         if i == 5:
-            phone = line.split('"tel:')[1].split('"')[0]
+            person["phone"] = line.split('"tel:')[1].split('"')[0]
             # phone = line.split('</dd')[0]
+
+    return person
+
+# print from dictionary
+def printdic(dic):
+
+    name = dic.get("name")
+    title = dic.get("title")
+    dept = dic.get("dept")
+    phone = dic.get("phone")
 
     print("Name:", name)
     print("Title:", title)
     print("Department:", dept)
     print("Phone:", phone)
+    print(" ")
+
+if __name__ == '__main__':
+
+    listurl = makeurl()
+
+    content = []
+    for i in range(0,len(listurl)):
+        content.append(getstring(listurl[i]))  # get the string from html
+
+    for i in range(0,len(listurl)):
+        dic = makedic(content[i])
+        printdic(dic)
 
 # this code currently doesn't defend against random inputs. As in you can type in
 # James Franco and it will go to an error.
+
