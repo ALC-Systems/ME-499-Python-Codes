@@ -3,33 +3,46 @@
 # python D:\PythonScripts\499hw2\directory.py
 import urllib.request, sys
 
+# returns the string from html
 def getstring(url):
     buffer = urllib.request.urlopen(url)
     string = str(buffer.read().decode('utf-8'))
     return string
 
+# make the first letter of string upper case
+def firstupper(element):
+    element = list(element)
+    element[0] = element[0].upper()
+    element = ''.join(element)
+    return element
 
-if __name__ == '__main__':
-
+# this function will construct the url(s) based on cmd input
+def makeurl():
+    first = []
+    last = []
+    URL = []
+    # construct first and last arrays
     if len(sys.argv) != 1:  # if there are input arguments
+        for i in range(1,len(sys.argv)):
+            if i % 2 != 0: # odd index arguments are first names
+                first.append(firstupper(sys.argv[i]))
 
-        first = sys.argv[1]
-        last = sys.argv[2]
+            elif i % 2 == 0:  # even index arguments are last names
+                last.append(firstupper(sys.argv[i]))
 
-    else:
-
+    else:  # if no input arguments
         print("No input arguments provided!")
 
-    first = list(first)
-    first[0] = first[0].upper()
-    first = ''.join(first)
-
-    last = list(last)
-    last[0] = last[0].upper()
-    last = ''.join(last)
     # construct search url
-    url = 'http://directory.oregonstate.edu/?type=search&cn=' + first + '+' + last
-    content = getstring(url)  # get the string from html
+    for i in range(0,len(first)):
+        URL.append('http://directory.oregonstate.edu/?type=search&cn=' + first[i] + '+' + last[i])
+
+    return URL
+if __name__ == '__main__':
+
+    listurl = makeurl()
+
+    content = getstring(listurl[1])  # get the string from html
 
     person = {}  # empty dictionary for dude
 
