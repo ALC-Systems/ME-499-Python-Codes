@@ -1,53 +1,98 @@
 #!/usr/bin/env python3\
 
-# python D:\PythonScripts\499hw2\directory.py
+# python D:\PythonScripts\499hw2\directory.py nancy squires william smart kyle niemeyer
+# python D:\PythonScripts\499hw2\directory.py nancy squires billy smart kyle niemeyer
+
 import urllib.request, sys
 
+# returns the string from html
 def getstring(url):
     buffer = urllib.request.urlopen(url)
     string = str(buffer.read().decode('utf-8'))
     return string
 
+# make the first letter of string upper case
+def firstupper(element):
+    element = list(element)
+    element[0] = element[0].upper()
+    element = ''.join(element)
+    return element
 
-if __name__ == '__main__':
-
+# this function will construct the url(s) based on cmd input
+def makeurl():
+    first = []
+    last = []
+    URL = []
+    # construct first and last arrays
     if len(sys.argv) != 1:  # if there are input arguments
+        for i in range(1,len(sys.argv)):
+            if i % 2 != 0: # odd index arguments are first names
+                first.append(firstupper(sys.argv[i]))
 
-        first = sys.argv[1]
-        last = sys.argv[2]
+            elif i % 2 == 0:  # even index arguments are last names
+                last.append(firstupper(sys.argv[i]))
 
-    else:
-
+    else:  # if no input arguments
         print("No input arguments provided!")
 
-    first = list(first)
-    first[0] = first[0].upper()
-    first = ''.join(first)
-
-    last = list(last)
-    last[0] = last[0].upper()
-    last = ''.join(last)
     # construct search url
-    url = 'http://directory.oregonstate.edu/?type=search&cn=' + first + '+' + last
-    content = getstring(url)  # get the string from html
+    for i in range(0,len(first)):
+        URL.append('http://directory.oregonstate.edu/?type=search&cn=' + first[i] + '+' + last[i])
+
+    return URL
+# function that stores each person's attributes and prints them
+def makedic(content, index = 0):
 
     person = {}  # empty dictionary for dude
 
     for i, line in enumerate(content.split('<dd>')):
         if i == 1:  # name
-            name = line.split('</dd')[0]
+            person["name"] = line.split('</dd')[0]
         if i == 3:
-            title = line.split('</dd')[0]
+            person["title"] = line.split('</dd')[0]
         if i == 4:
-            dept = line.split('</dd')[0]
+            person["dept"] = line.split('</dd')[0]
         if i == 5:
-            phone = line.split('"tel:')[1].split('"')[0]
+            person["phone"] = line.split('"tel:')[1].split('"')[0]
             # phone = line.split('</dd')[0]
 
-    print("Name:", name)
-    print("Title:", title)
-    print("Department:", dept)
-    print("Phone:", phone)
+    person["index"] = index
+
+    return person
+
+# print from dictionary
+def printdic(dic):
+
+    name = dic.get("name")
+    title = dic.get("title")
+    dept = dic.get("dept")
+    phone = dic.get("phone")
+    index = dic.get("index")
+
+    if name == None or title == None or dept == None or phone == None:
+        print("Your #",index + 1,"input is garbage...")
+        print("No one goes by a name like", sys.argv[index * 2 + 1],sys.argv[index * 2 + 2],"!!!")
+        print("")
+
+    else:
+        print("Name:", name)
+        print("Title:", title)
+        print("Department:", dept)
+        print("Phone:", phone)
+        print(" ")
+
+if __name__ == '__main__':
+
+    listurl = makeurl()
+
+    content = []
+    for i in range(0,len(listurl)):
+        content.append(getstring(listurl[i]))  # get the string from html
+
+    for i in range(0,len(listurl)):
+        dic = makedic(content[i],i)
+        printdic(dic)
 
 # this code currently doesn't defend against random inputs. As in you can type in
 # James Franco and it will go to an error.
+
