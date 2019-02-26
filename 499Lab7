@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+import math
+# functions for testing
+def f(x):
+    return (x**3)
+
+def f2(x):
+    return math.sin(x)
+
+# stepping up
+def optimize_step(f,bounds,n):
+    lower, upper = bounds
+
+
+# random samples doing the same thing
+def optimize_random(f, bounds, n):
+
+    lower, upper = bounds
+
+
+if __name__ == '__main__':
+
+
+
+
