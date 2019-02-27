@@ -8,17 +8,23 @@ def f(x):
 def f2(x):
     return math.sin(x)
 
+def f3(x,y):   # this is a 3d function
+    z = x**2 + y**2
+    return z
+
 # stepping up
 def optimize_step(f,bounds,n):
     y = []
     lower, upper = bounds
     x = numpy.linspace(lower, upper, n)
     maxval = f(x[0])          # first known max. since it's the only one
+    xval = x[0]
     for i in x:
         y.append(f(i))
         if f(i) > maxval:     # if current value greater than known max thus far
             maxval = f(i)     # ...overwrite the known maxval.
-    return maxval
+            xval = i
+    return maxval,xval   # may need to get rid of the "maxval".
 
 
 # random samples doing the same thing
@@ -29,9 +35,32 @@ def optimize_random(f, bounds, n):
     for i in range(0,n):
         x = random.uniform(lower, upper)
         y.append(f(x))
+        xval = x[0]
         if f(i) > maxval:  # if current value greater than known max thus far
             maxval = f(i)  # ...overwrite the known maxval.
-    return maxval
+            xval = i
+    return maxval, xval
+
+# multi dimensional ( really just 3d...maybe 4)
+def optimize_md(f,bounds,n=1000):   # default takes 1000 steps
+    lowerx,upperx,lowery.uppery = bounds
+    x = numpy.linspace(lowerx, upperx, n)
+    y = numpy.linspace(lowery, uppery, n)
+    z = []
+    maxval = f(x[0],y[0])    # initial
+    xval = x[0]              # initial x value
+    yval = y[0]
+    for i in x:
+        for j in y:
+            z.append(f(i,j))
+            if f(i) > maxval:  # if current value greater than known max thus far
+                maxval = f(i)  # ...overwrite the known maxval.
+                xval = i
+                yval = j
+
+    tup = (i,j,maxval)
+
+    return tup
 
 
 if __name__ == '__main__':
