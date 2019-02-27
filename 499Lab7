@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-import math
+import math, numpy, random
+
 # functions for testing
 def f(x):
     return (x**3)
@@ -9,16 +10,37 @@ def f2(x):
 
 # stepping up
 def optimize_step(f,bounds,n):
+    y = []
     lower, upper = bounds
+    x = numpy.linspace(lower, upper, n)
+    maxval = f(x[0])          # first known max. since it's the only one
+    for i in x:
+        y.append(f(i))
+        if f(i) > maxval:     # if current value greater than known max thus far
+            maxval = f(i)     # ...overwrite the known maxval.
+    return maxval
 
 
 # random samples doing the same thing
 def optimize_random(f, bounds, n):
-
+    y = []
     lower, upper = bounds
+    maxval = f(random.uniform(lower, upper))  # first known max, since it's the only one...
+    for i in range(0,n):
+        x = random.uniform(lower, upper)
+        y.append(f(x))
+        if f(i) > maxval:  # if current value greater than known max thus far
+            maxval = f(i)  # ...overwrite the known maxval.
+    return maxval
 
 
 if __name__ == '__main__':
+
+    solution = optimize_step(f2,(0,4),1000)
+    print(solution)
+
+    solution2 = optimize_random(f2,(0,4),1000)
+    print(solution2)
 
 
 
