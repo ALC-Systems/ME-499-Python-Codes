@@ -39,19 +39,23 @@ def optimize_step(f,bounds,n):
 def optimize_random(f, bounds, n):
     y = []
     lower, upper = bounds
-    xval = random.uniform(lower, upper)   # first known x
-    maxval = f(xval)        # first known max, since it's the only one...
+    maxval = f(lower)
+    xval = lower
+    xs = []
     for i in range(0,n):
         x = random.uniform(lower, upper)
+        xs.append(x)
         y.append(f(x))
-        if f(i) > maxval:  # if current value greater than known max thus far
-            maxval = f(i)  # ...overwrite the known maxval.
-            xval = i
+
+    maxval = max(y)         # get max value in y
+    xind = y.index(maxval)  # get index for max value
+    xval = xs[xind]        # get x corresponding to index
+
     return maxval, xval
 
 # multi dimensional ( really just 3d...maybe 4)
 def optimize_md(f,bounds,n=1000):   # default takes 1000 steps
-    lowerx,upperx,lowery, uppery = bounds
+    lowerx, upperx, lowery, uppery = bounds
     x = numpy.linspace(lowerx, upperx, n)
     y = numpy.linspace(lowery, uppery, n)
     z = []
@@ -73,14 +77,15 @@ def optimize_md(f,bounds,n=1000):   # default takes 1000 steps
 
 if __name__ == '__main__':
 
-    solution = optimize_step(f2,(0,4),1000)
+    solution = optimize_step(f2,(0,4),100)
     print(solution)
 
-    solution2 = optimize_random(f2,(0,4),1000)
+    solution2 = optimize_random(f2,(0,4),100)
     print(solution2)
 
-    optsol = optimize.fmin(f2neg,1)
-
+    [xopt, fopt, iter, funccalls, warnflags] = optimize.fmin(f2neg, 1, full_output = 1, disp = False, retall = False)
+    print(fopt,float(xopt)) # fopt is a float, value of function at minimum; xopt is the
+    ################## parameter that minimizes the function
 
 
 
