@@ -1,12 +1,20 @@
 #!/usr/bin/env python3
 import math, numpy, random
+from scipy import optimize
+
 
 # functions for testing
 def f(x):
     return (x**3)
 
+def f(x):
+    return -1 * (x**3)
+
 def f2(x):
     return math.sin(x)
+
+def f2neg(x):
+    return -1 * math.sin(x)
 
 def f3(x,y):   # this is a 3d function
     z = x**2 + y**2
@@ -31,11 +39,11 @@ def optimize_step(f,bounds,n):
 def optimize_random(f, bounds, n):
     y = []
     lower, upper = bounds
-    maxval = f(random.uniform(lower, upper))  # first known max, since it's the only one...
+    xval = random.uniform(lower, upper)   # first known x
+    maxval = f(xval)        # first known max, since it's the only one...
     for i in range(0,n):
         x = random.uniform(lower, upper)
         y.append(f(x))
-        xval = x[0]
         if f(i) > maxval:  # if current value greater than known max thus far
             maxval = f(i)  # ...overwrite the known maxval.
             xval = i
@@ -43,7 +51,7 @@ def optimize_random(f, bounds, n):
 
 # multi dimensional ( really just 3d...maybe 4)
 def optimize_md(f,bounds,n=1000):   # default takes 1000 steps
-    lowerx,upperx,lowery.uppery = bounds
+    lowerx,upperx,lowery, uppery = bounds
     x = numpy.linspace(lowerx, upperx, n)
     y = numpy.linspace(lowery, uppery, n)
     z = []
@@ -58,7 +66,7 @@ def optimize_md(f,bounds,n=1000):   # default takes 1000 steps
                 xval = i
                 yval = j
 
-    tup = (i,j,maxval)
+    tup = (xval,yval,maxval)
 
     return tup
 
@@ -70,6 +78,8 @@ if __name__ == '__main__':
 
     solution2 = optimize_random(f2,(0,4),1000)
     print(solution2)
+
+    optsol = optimize.fmin(f2neg,1)
 
 
 
