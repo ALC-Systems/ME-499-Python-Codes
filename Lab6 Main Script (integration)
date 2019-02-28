@@ -1,188 +1,114 @@
 #!/usr/bin/env python3
-# Questions
-# MC looks like it has fluctuating error
+import math, numpy, random, matplotlib.pyplot as plt
+from scipy import optimize
 
-import numpy as np, matplotlib.pyplot as plt, random, math
-from toolz import *            # is this ok???
 
+# functions for testing
 def f(x):
     return (x**3)
+
+def f(x):
+    return -1 * (x**3)
 
 def f2(x):
     return math.sin(x)
 
-# integrate function 2, MC function
+def f2neg(x):
+    return -1 * math.sin(x)
 
-def integrate_mc(f,a,b,sometuple, numsample = 1000):
+def f3(x,y):   # this is a 3d function
+    z = x**2 + y**2   # min will be z = 0 for x=0, y=0
+    return z
 
-    c,d = sometuple
-    area = abs(b - a) * abs(c - d)
-
-    outx = []
-    outy = []
-    posx = []
-    posy = []
-    negx = []
-    negy = []
-    for i in range(0, numsample):
-        x1 = random.uniform(a, b)
-        y1 = random.uniform(c, d)
-        ys = f(x1)
-
-        # if ys is positive
-        if ys > 0:
-            if y1 > 0 and y1 <= ys:
-                posx.append(x1)
-                posy.append(y1)
-
-            else:
-                outx.append(x1)
-                outy.append(y1)
-
-        # if ys is negative
-        elif ys < 0 or ys == 0:
-            if y1 < 0 and y1 >= ys:
-                negx.append(x1)
-                negy.append(y1)
-
-            else:
-                outx.append(x1)
-                outy.append(y1)
-
-    # if you want a hot mess, uncomment these lines:
-    # plt.plot(posx, posy, 'go')
-    # plt.plot(outx, outy, 'ro')
-    # plt.plot(negx, negy, 'bo')
-    # plt.grid(True)
-    # plt.show()
-
-    result = area * ((len(posx)/numsample) - (len(negx)/numsample))
-
-    return result
-
-# integrate function 1, Riemann Sums
-
-def integrate(f,a,b,numstep = 100):  # what should the default numstep be??? Setting it to 100
-
-    if type(a) != int and type(a) != float:
-        print('Use a number for a, not whatever you did!')
-        raise ValueError
-
-    if type(b) != int and type(b) != float:
-        print('Use a number for b, not whatever you did!')
-        raise ValueError
-
-    if type(numstep) != int and type(numstep) != float:
-        print('Use a number for numstep, not whatever you did!')
-        raise ValueError
-
-    sumint = 0                       # placeholder for sum
-    stepsize = (b-a)/numstep      # calculate step size
-    area = []                     # empty array for area of rectangles
-    y = []                        # empty array for y values
-    x = np.linspace(a,b,numstep)  # x values
+# stepping up
+def optimize_step(f,bounds,n):
+    y = []
+    lower, upper = bounds
+    x = numpy.linspace(lower, upper, n)
+    maxval = f(x[0])          # first known max. since it's the only one
+    xval = x[0]
     for i in x:
-        y.append(f(i))            # makes list of y values corresponding to x values
-        area.append(stepsize * f(i))
-
-    for i in area:
-        sumint = sumint + i              # sum all the areas
-
-    return sumint
+        y.append(f(i))
+        if f(i) > maxval:     # if current value greater than known max thus far
+            maxval = f(i)     # ...overwrite the known maxval.
+            xval = i
+    return maxval,xval   # may need to get rid of the "maxval".
 
 
-# function for approx. pi
+# random samples doing the same thing
+def optimize_random(f, bounds, n):
+    y = []
+    lower, upper = bounds
+    xs = []
+    for i in range(0,n):
+        x = random.uniform(lower, upper)
+        xs.append(x)
+        y.append(f(x))
 
-def approximate_pi(numsample = 1000):  # n is the number of samples used
+    maxval = max(y)         # get max value in y
+    xind = y.index(maxval)  # get index for max value
+    xval = xs[xind]        # get x corresponding to index
 
-    area = 4
-    overx = []
-    overy = []
-    underx = []
-    undery = []
-    for i in range(0, numsample):
-        x1 = random.uniform(-1, 1)
-        y1 = random.uniform(-1, 1)
-        length = math.sqrt(x1**2 + y1**2)
-        if length >= 1:
-            overx.append(x1)
-            overy.append(y1)
+    return maxval, xval
 
-        else:
-            underx.append(x1)
-            undery.append(y1)
+# multi dimensional ( really just 3d...maybe 4)
+def optimize_md(f,bounds):   # default takes 1000 steps
+    lowest = []
+    dim = len(bounds)
+    uppers = []
+    lowers = []
+    for i in bounds:
+        lower, upper = i
+        lowers.append(lower)
+        uppers.append(upper)
 
-    approx = area * len(underx) / numsample
-    # plot
-    plt.plot(overx, overy, 'ro')
-    plt.plot(underx, undery, 'bo')
-    plt.title('MC Unit Circle')
-    plt.grid(True)
-    # plt.show()
-
-    return approx
-
+    return 0
 
 if __name__ == '__main__':
 
-    solution = 156.25
-# riemann sum
-    sum1 = integrate(f2, 0, math.pi)
-    print('Riemann sum integration result:', sum1)
+    solution = optimize_step(f2,(0,4),100)
+    print(solution)
 
-# MC, between 0 and 5 0.25x^4 goes to just under 160. Use -10, 170 as the bounding box
+    solution2 = optimize_random(f2,(0,4),100)
+    print(solution2)
 
-    sum2 = integrate_mc(f, 0, 5, (-10,170),5000)
+    [xopt, fopt, iter, funccalls, warnflags] = optimize.fmin(f2neg, 1, full_output = 1, disp = 0, retall = False)
+    print(fopt,float(xopt)) # fopt is a float, value of function at minimum; xopt is the
+    print(iter)
 
-    print('Monte Carlo integration result:', sum2)
+    ################## parameter that minimizes the function
 
-    sum3 = integrate_mc(f2, 0, 3 * math.pi, (-1.5, 1.5),5000)
+    # res = optimize_md(f3,[(-11,11),(-11,11)])
+    # print(res)
 
-    print('Monte Carlo integration result:', sum3)
-
-# # plot results and errors:
-# MC Error
-    numpts = 1000    # for keeping the number of points consistent
+# plots
+# the solution for sin(x) over [0,4] is 1, at about 1.57 (0.5*pi).
     error1 = []
     error2 = []
-    for i in range(100,numpts):
-        mcsum = integrate_mc(f,0,5,(0,160),i)
-        error1.append(abs(mcsum - solution))
+    numpt = 100
+    for i in range(1,numpt+1):
+        solution = 1
+        sol1,x1 = optimize_step(f2,(0,4),i)
+        sol2,x2 = optimize_random(f2,(0,4),i)
+        # errors
+        error1.append(abs(sol1 - solution))
+        error2.append(abs(sol2 - solution))
 
-# Riemann sum error
-    ind = []
-    for i in range(100, numpts):
-        ind.append(i)
-        rsum = integrate(f,0,5,i)
-        error2.append(abs(rsum - solution))
-
-
-    # plot
-    plt.plot(ind, error1, 'ro', label = "MC Error")
-    plt.plot(ind,error2,'bo', label = "Riemann Sum Error")
-    plt.title('Riemann Sum and MC Error vs # of Samples')
+    ind = numpy.linspace(0,numpt,numpt)
+    plt.plot(ind,error1, label = "Step")
+    plt.plot(ind,error2, label = "Random")
+    plt.title('Random, Step Up, and fmin Accuracy for Optimizing')
     plt.grid(True)
     plt.xlabel('Number of Samples')
     plt.ylabel('Error')
+
+# fmin error
+    error3 = abs((-fopt) - solution)
+
+    plt.plot(iter,error3, 'bo', label = "fmin")
+
     plt.legend()
     plt.show()
-
-# # plot function curve
-#
-#     a = np.linspace(0, 5, 100)
-#     y = []
-#     for i in a:
-#         y.append(f(i))
-#
-#     plt.plot(a, y)  # plot x^4 / 4
-#     plt.grid(True)
-#     plt.show()
-#
-# # estimate pi
-#
-#     est = approximate_pi(100000)
-#     print('Monte Carlo estimate of pi:', est)
-
 
 
 
