@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (QApplication, QCheckBox, QGridLayout, QGroupBox,
@@ -6,14 +8,29 @@ from PyQt5.QtWidgets import (QApplication, QCheckBox, QGridLayout, QGroupBox,
 class Window(QWidget):
     def __init__(self, parent=None):
         super(Window, self).__init__(parent)
+        app.setStyle('Fusion')
+
     # quit button
         quit_button = QPushButton('Quit')
         quit_button.clicked.connect(app.exit)
+
+    # simulate button
+        simulate_button = QPushButton('Simulate')
+        simulate_button.clicked.connect(lambda: print('Mass: ', self.mass.value()/100, 'Spring: ', self.spring.value()/100, 'Damper: ', self.damper.value()/100, 'Time: ', self.time.value()/10, 'Timestep: ', self.timestep.value()/10000))
+
+    # misc labels
+        group1label = QLabel('System Parameters')
+        group2label = QLabel('Simulation Parameters')
+
+
     # layout
         grid = QGridLayout()
-        grid.addWidget(self.group1(), 0, 0)
-        grid.addWidget(self.group2(), 1, 0)
-        grid.addWidget(quit_button)
+        grid.addWidget(group1label, 0, 0)
+        grid.addWidget(self.group1(), 1, 0)
+        grid.addWidget(group2label, 2, 0)
+        grid.addWidget(self.group2(), 3, 0)
+        grid.addWidget(simulate_button, 4, 0)
+        grid.addWidget(quit_button, 5, 0)
     # title and such
         self.setLayout(grid)
         self.setWindowTitle("Fake Simulator")
@@ -140,6 +157,15 @@ class Window(QWidget):
         val /= 10000
         words = 'Time step(s): ' + str(val)
         self.timesteplabel.setText(words)
+
+    def printall(self):
+        mass = self.mass.value()
+        spring = self.spring.value()
+        damper = self.damper.value()
+        time = self.time.value()
+        timestep = self.timestep.value()
+
+        print('Mass: ', mass, 'Spring: ', spring, 'Damper: ', damper, 'Time: ', time, 'Timestep: ', timestep)
 
 
 if __name__ == '__main__':
