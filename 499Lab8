@@ -1,65 +1,55 @@
 #!/usr/bin/env python3
 
-import sys
 
-from PyQt5.QtWidgets import QApplication, QSlider, \
-    QMainWindow, QWidget, QPushButton, QVBoxLayout, QLabel\
+from PyQt5.QtWidgets import QApplication, \
+    QMainWindow, QWidget, QPushButton, QVBoxLayout, \
+    QLabel, QSlider
 
 from PyQt5.QtCore import Qt
 
 
 class Interface(QMainWindow):
     def __init__(self):
-
         QMainWindow.__init__(self)
+        self.setWindowTitle('slidertest2')
 
-        self.setWindowTitle('Slider')
+        # A widget to hold everything
+        widget = QWidget()
+        self.setCentralWidget(widget)
+        self.setGeometry(100, 100, 200, 200)   # set size
 
-    # Set window size
-        self.setGeometry(100,100,200,200)
-
-    # A widget to hold everything
-        window = QWidget()
-        self.setCentralWidget(window)
-
-    # label
-        self.label1 = QLabel(window)
-        self.label1.move(25,0)
-
-    # A layout
+        # A layout
         layout = QVBoxLayout()
-        window.setLayout(layout)
+        widget.setLayout(layout)
 
-    # Top button
-        self.topbutton = QPushButton('Top')
-
-    # quit button
-        self.quit_button = QPushButton('Quit')
-
-    # slider
+        # Slider
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setTickPosition(QSlider.TicksAbove)
         self.slider.setMinimum(0)
-        self.slider.setMaximum(100)
-        # self.slider.setValue(100)
-        # self.slider.setTickInterval(1)
+        self.slider.setMaximum(10)
+        self.slider.setTickInterval(1)
+        self.slider.valueChanged.connect(self.slider_val)
 
-    # Add things to the layout
-        layout.addWidget(self.topbutton)
-        layout.addWidget(self.quit_button)
+        # label
+        self.label1 = QLabel()
+        self.slider_val()
+
+        # Quit button
+        quit_button = QPushButton('Quit')
+        quit_button.clicked.connect(app.exit)
+
+        # You probably want to add in other interface elements here
+
+        # Add things to the layout
+        layout.addWidget(self.label1)
+        layout.addWidget(quit_button)
         layout.addWidget(self.slider)
-    # Add other widgets to the layout here.  Possibly other layouts.
 
-    # make stuff happen
-        # quit button
-        self.quit_button.clicked.connect(app.exit)
-        self.slider.valueChanged.connect(self.sliderval)
-        # label1.setText(str(self.slider.value()))
-
-
-    def sliderval(self):
-        self.label.setText(str(self.slider.value()))
-
+        # Add other widgets to the layout here.  Possibly other layouts.
+    def slider_val(self):
+        val = self.slider.value()
+        val /= 10
+        self.label1.setText(str(val))
 
 
 if __name__ == '__main__':
