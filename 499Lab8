@@ -1,0 +1,73 @@
+#!/usr/bin/env python3
+
+import sys
+
+from PyQt5.QtWidgets import QApplication, QSlider, \
+    QMainWindow, QWidget, QPushButton, QVBoxLayout, QLabel\
+
+from PyQt5.QtCore import Qt
+
+
+class Interface(QMainWindow):
+    def __init__(self):
+
+        QMainWindow.__init__(self)
+
+        self.setWindowTitle('Slider')
+
+    # Set window size
+        self.setGeometry(100,100,200,200)
+
+    # A widget to hold everything
+        window = QWidget()
+        self.setCentralWidget(window)
+
+    # label
+        self.label1 = QLabel(window)
+        self.label1.move(25,0)
+
+    # A layout
+        layout = QVBoxLayout()
+        window.setLayout(layout)
+
+    # Top button
+        self.topbutton = QPushButton('Top')
+
+    # quit button
+        self.quit_button = QPushButton('Quit')
+
+    # slider
+        self.slider = QSlider(Qt.Horizontal)
+        self.slider.setTickPosition(QSlider.TicksAbove)
+        self.slider.setMinimum(0)
+        self.slider.setMaximum(100)
+        # self.slider.setValue(100)
+        # self.slider.setTickInterval(1)
+
+    # Add things to the layout
+        layout.addWidget(self.topbutton)
+        layout.addWidget(self.quit_button)
+        layout.addWidget(self.slider)
+    # Add other widgets to the layout here.  Possibly other layouts.
+
+    # make stuff happen
+        # quit button
+        self.quit_button.clicked.connect(app.exit)
+        self.slider.valueChanged.connect(self.sliderval)
+        # label1.setText(str(self.slider.value()))
+
+
+    def sliderval(self):
+        self.label.setText(str(self.slider.value()))
+
+
+
+if __name__ == '__main__':
+    app = QApplication([])
+
+    interface = Interface()
+
+    interface.show()
+
+    app.exec_()
+
