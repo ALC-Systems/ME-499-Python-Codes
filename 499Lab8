@@ -1,25 +1,23 @@
 #!/usr/bin/env python3
 
-
 from PyQt5.QtWidgets import QApplication, \
     QMainWindow, QWidget, QPushButton, QVBoxLayout, \
-    QLabel, QSlider
+    QLabel, QSlider, QHBoxLayout
 
 from PyQt5.QtCore import Qt
 
-
-class Interface(QMainWindow):
+class SliderDisplay(QMainWindow):
     def __init__(self):
         QMainWindow.__init__(self)
-        self.setWindowTitle('slidertest2')
+        self.setWindowTitle('Slider')
 
         # A widget to hold everything
         widget = QWidget()
         self.setCentralWidget(widget)
-        self.setGeometry(100, 100, 200, 200)   # set size
+        self.setGeometry(100, 100, 300, 100)  # set size
 
         # A layout
-        layout = QVBoxLayout()
+        layout = QHBoxLayout()
         widget.setLayout(layout)
 
         # Slider
@@ -34,30 +32,27 @@ class Interface(QMainWindow):
         self.label1 = QLabel()
         self.slider_val()
 
-        # Quit button
-        quit_button = QPushButton('Quit')
-        quit_button.clicked.connect(app.exit)
-
         # You probably want to add in other interface elements here
 
         # Add things to the layout
         layout.addWidget(self.label1)
-        layout.addWidget(quit_button)
         layout.addWidget(self.slider)
 
         # Add other widgets to the layout here.  Possibly other layouts.
+
     def slider_val(self):
         val = self.slider.value()
-        val /= 10
-        self.label1.setText(str(val))
-
+        # val /= 10
+        words = 'foo: '+str(val)
+        self.label1.setText(words)
 
 if __name__ == '__main__':
+
     app = QApplication([])
 
-    interface = Interface()
+    window = SliderDisplay()
 
-    interface.show()
+    window.show()
 
     app.exec_()
 
