@@ -1,58 +1,164 @@
-#!/usr/bin/env python3
-
-from PyQt5.QtWidgets import QApplication, \
-    QMainWindow, QWidget, QPushButton, QVBoxLayout, \
-    QLabel, QSlider, QHBoxLayout
-
+import sys
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import (QApplication, QCheckBox, QGridLayout, QGroupBox,
+        QMenu, QPushButton, QRadioButton, QVBoxLayout, QWidget, QSlider, QLabel)
 
-class SliderDisplay(QMainWindow):
-    def __init__(self):
-        QMainWindow.__init__(self)
-        self.setWindowTitle('Slider')
+class Window(QWidget):
+    def __init__(self, parent=None):
+        super(Window, self).__init__(parent)
+        app.setStyle('Fusion')
 
-        # A widget to hold everything
-        widget = QWidget()
-        self.setCentralWidget(widget)
-        self.setGeometry(100, 100, 300, 100)  # set size
+    # quit button
+        quit_button = QPushButton('Quit')
+        quit_button.clicked.connect(app.exit)
 
-        # A layout
-        layout = QHBoxLayout()
-        widget.setLayout(layout)
+    # simulate button
+        simulate_button = QPushButton('Simulate')
 
-        # Slider
-        self.slider = QSlider(Qt.Horizontal)
-        self.slider.setTickPosition(QSlider.TicksAbove)
-        self.slider.setMinimum(0)
-        self.slider.setMaximum(10)
-        self.slider.setTickInterval(1)
-        self.slider.valueChanged.connect(self.slider_val)
+    # misc labels
+        group1label = QLabel('System Parameters')
+        group2label = QLabel('Simulation Parameters')
 
-        # label
-        self.label1 = QLabel()
-        self.slider_val()
 
-        # You probably want to add in other interface elements here
+    # layout
+        layout = QVBoxLayout()
+        grid = QGridLayout()
+        grid.addWidget(group1label, 0, 0)
+        grid.addWidget(self.group1(), 1, 0)
+        grid.addWidget(group2label, 2, 0)
+        grid.addWidget(self.group2(), 3, 0)
+        grid.addWidget(simulate_button, 4, 0)
+        grid.addWidget(quit_button, 5, 0)
+    # title and such
+        self.setLayout(grid)
+        self.setWindowTitle("Fake Simulator")
+        self.resize(400, 300)
 
-        # Add things to the layout
-        layout.addWidget(self.label1)
-        layout.addWidget(self.slider)
+    def group1(self):
 
-        # Add other widgets to the layout here.  Possibly other layouts.
+        groupBox = QGroupBox()
+        vbox = QVBoxLayout()       # Vertical boxes
 
-    def slider_val(self):
-        val = self.slider.value()
-        # val /= 10
-        words = 'foo: '+str(val)
-        self.label1.setText(words)
+# variables
+        self.mass = QSlider(Qt.Horizontal)
+        self.mass.setTickPosition(QSlider.TicksAbove)
+        self.mass.setMinimum(0)
+        self.mass.setMaximum(1000)
+        self.mass.setTickInterval(1)
+        self.mass.valueChanged.connect(self.mass_val)
+
+        self.spring = QSlider(Qt.Horizontal)
+        self.spring.setTickPosition(QSlider.TicksAbove)
+        self.spring.setMinimum(0)
+        self.spring.setMaximum(1000)
+        self.spring.setTickInterval(1)
+        self.spring.valueChanged.connect(self.spring_val)
+
+        self.damper = QSlider(Qt.Horizontal)
+        self.damper.setTickPosition(QSlider.TicksAbove)
+        self.damper.setMinimum(0)
+        self.damper.setMaximum(1000)
+        self.damper.setTickInterval(1)
+        self.damper.valueChanged.connect(self.damper_val)
+
+        # labels
+        # mass label
+        self.masslabel = QLabel()
+        self.mass_val()
+
+        # spring label
+        self.springlabel = QLabel()
+        self.spring_val()
+
+        # damper label
+        self.damperlabel = QLabel()
+
+        self.damper_val()
+
+        vbox.addWidget(self.masslabel)
+        vbox.addWidget(self.mass)
+        vbox.addWidget(self.springlabel)
+        vbox.addWidget(self.spring)
+        vbox.addWidget(self.damperlabel)
+        vbox.addWidget(self.damper)
+        vbox.addStretch(1)
+
+        groupBox.setLayout(vbox)
+
+        return groupBox
+
+    def group2(self):
+        groupBox = QGroupBox()
+        vbox = QVBoxLayout()  # Vertical boxes
+
+# variables
+        self.time = QSlider(Qt.Horizontal)
+        self.time.setTickPosition(QSlider.TicksAbove)
+        self.time.setMinimum(0)
+        self.time.setMaximum(1000)
+        self.time.setTickInterval(1)
+        self.time.valueChanged.connect(self.time_val)
+
+        self. timestep = QSlider(Qt.Horizontal)
+        self. timestep.setTickPosition(QSlider.TicksAbove)
+        self. timestep.setMinimum(0)
+        self. timestep.setMaximum(1000)
+        self. timestep.setTickInterval(1)
+        self. timestep.valueChanged.connect(self.timestep_val)
+
+        # labels
+        # time label
+        self.timelabel = QLabel()
+        self.time_val()
+
+        # timestep label
+        self.timesteplabel = QLabel()
+
+        self.timestep_val()
+
+        vbox.addWidget(self.timelabel)
+        vbox.addWidget(self.time)
+        vbox.addWidget(self.timesteplabel)
+        vbox.addWidget(self.timestep)
+        vbox.addStretch(1)
+
+        groupBox.setLayout(vbox)
+
+        return groupBox
+
+    def mass_val(self):
+        val = self.mass.value()
+        val /= 100
+        words = 'Mass: ' + str(val)
+        self.masslabel.setText(words)
+
+    def spring_val(self):
+        val = self.spring.value()
+        val /= 100
+        words = 'Spring: ' + str(val)
+        self.springlabel.setText(words)
+
+    def damper_val(self):
+        val = self.damper.value()
+        val /= 100
+        words = 'Damper: ' + str(val)
+        self.damperlabel.setText(words)
+
+    def time_val(self):
+        val = self.time.value()
+        val /= 10
+        words = 'Time(s): ' + str(val)
+        self.timelabel.setText(words)
+
+    def timestep_val(self):
+        val = self.timestep.value()
+        val /= 10000
+        words = 'Time step(s): ' + str(val)
+        self.timesteplabel.setText(words)
+
 
 if __name__ == '__main__':
-
-    app = QApplication([])
-
-    window = SliderDisplay()
-
-    window.show()
-
-    app.exec_()
-
+    app = QApplication(sys.argv)
+    clock = Window()
+    clock.show()
+    sys.exit(app.exec_())
