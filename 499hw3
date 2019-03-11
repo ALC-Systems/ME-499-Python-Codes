@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+# exe path: python D:\PythonScripts\499hw3\scratch1.py
+import sys
+
+
+#  sys arg: [0] py script name;
+
+
+class Simulator():
+    def __init__(self, numinst = sys.argv[3]): # instance
+        self.numinst = numinst
+
+    # def
+
+if __name__ == '__main__':
+
+    simulator = Simulator()
+
+    print(simulator.numinst)
+
+
