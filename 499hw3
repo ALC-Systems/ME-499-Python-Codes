@@ -1,21 +1,44 @@
 #!/usr/bin/env python3
-# exe path: python D:\PythonScripts\499hw3\scratch1.py
-import sys
+
+# to run the exe from commandine:
+# D:\PythonScripts\499hw3\simulator.exe waypoints 10
+
+# this script's path:
+# python D:\PythonScripts\499hw3\scratch1.py simulator.exe waypoints 10
+
+import sys, os, subprocess
 
 
 #  sys arg: [0] py script name;
 
 
-class Simulator():
-    def __init__(self, numinst = sys.argv[3]): # instance
+class Simulator(object):
+    def __init__(self, exename = sys.argv[1], waypoints = sys.argv[2], numinst = sys.argv[3]):
+        # [0]script name; [1]exe file name; [2]waypoints; [3]instance num
         self.numinst = numinst
+        self.exename = exename
+        self.waypoints = waypoints
 
-    # def
+
+
+    # def evaluate():
+
+
 
 if __name__ == '__main__':
 
     simulator = Simulator()
 
-    print(simulator.numinst)
+    # subprocess.call(simulator.exename)
+    os.startfile(simulator.exename)
+    # use subprocess check_output
+
+
+    # print(simulator.exename)
+
+    # print(simulator.numinst)
+    #
+    # w = [(-10, -10), (0, 2), (10, 10)]   # list of tuples (waypoints)
+    # s = Simulator(10)
 
 
