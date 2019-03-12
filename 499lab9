@@ -3,7 +3,8 @@
 # what is the initial condition???
 # also is this thing supposed to be able to handle overdamping???
 
-# this script: python D:\PythonScripts\499lab9\smd-gui.py
+# This script:
+# python D:\PythonScripts\499lab9\smd-gui.py
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QSlider, QLabel, QGroupBox
 from PyQt5.QtCore import Qt
 
@@ -63,6 +64,7 @@ class SpringMassDamperGUI(QMainWindow):
 		system_layout = QVBoxLayout()
 		self.t = SliderDisplay('Time (s)', 0, 100)
 		self.dt = SliderDisplay('Time step (s)', 0.001, 0.1)
+		# self.x0 = SliderDisplay()
 		system_layout.addWidget(self.t)
 		system_layout.addWidget(self.dt)
 		system.setLayout(system_layout)
@@ -105,7 +107,6 @@ class SpringMassDamperGUI(QMainWindow):
 		# misc parameters
 		wn = math.sqrt(k/m)
 		zeta = c / (2 * math.sqrt(m * k))
-		wd = wn * math.sqrt(1 - zeta**2)
 
 		# update zeta accordingly
 
@@ -115,20 +116,36 @@ class SpringMassDamperGUI(QMainWindow):
 		# 	print('System is overdamped, Self Desctruction sequence initiated')
 		# 	raise ValueError
 
-
 		# construct line
 		if self.zeta < 1:
+			wd = wn * math.sqrt(1 - zeta ** 2)
+
 			for i in range(0, math.ceil(duration/dt)):
 				time += dt
+
 				disp = (self.x0dot + zeta * wn * self.x0) / wd
 				disp = disp * math.sin(wd * time)
 				disp = disp + self.x0 * math.cos(wd * time)
 				disp = disp * math.exp(-zeta * wn * time)
 
 				line.append(disp)
-		elif zeta >= 1:
-			c1, c2, r1, r2 = overdampedsoln(self.m, self.c, self.k, self.zeta, self.IC)
 
+		elif zeta >= 1:
+			for i in range(0, math.ceil(duration / dt)):
+				time += dt
+				x0 = self.IC[0]
+				xd0 = self.IC[1]
+				r1 = math.sqrt(c ** 2 - 4 * m * k) - c
+				r1 /= (2 * m)
+				r2 = (0 - c) - math.sqrt(c ** 2 - 4 * m * k)
+				r2 /= (2 * m)
+				c2 = xd0 - x0 * r1
+				c2 = c2 / (r2 - r1)
+
+				c1 = x0 - c2
+
+				xt = c1 * math.exp(r1 * time) + c2 * math.exp(r2 * time)
+				line.append(xt)
 
 		self.draw(line)
 
@@ -150,7 +167,7 @@ class SpringMassDamperGUI(QMainWindow):
 
 			self.behaviourtext.setText(damptype)
 
-			title = 'Spring-Mass-Damper System Behavior\nk = {0:.3f}, m = {1:.3f}, c = {2:.3f}, dt = {3:.3f}\n' .format(self.k.value(), self.m.value(), self.c.value(), self.dt.value()) + damptype
+			title = 'Spring-Mass-Damper System Behavior\nk = {0:.3f}, m = {1:.3f}, c = {2:.3f}, dt = {3:.3f}' .format(self.k.value(), self.m.value(), self.c.value(), self.dt.value())
 			ax.set_title(title)
 			# ax.set_title('Spring-Mass-Damper System Behavior\nk = {0:.3f}, m = {1:.3f}, c = {2:.3f}, dt = {3:.3f}\nstuff'.format(self.k.value(), self.m.value(), self.c.value(), self.dt.value()))
 			ax.set_xlabel('Time (s)')
@@ -201,17 +218,21 @@ class GraphingDisplay(FigureCanvas):
 		return self.add_subplot(111)
 
 
-def overdampedsoln(m, c, k, zeta, IC):
+def overdampedsoln(m, c, k,IC, t):
 	x0 = IC[0]
 	xd0 = IC[1]
-	r1 = -c + math.sqrt(c ** 2 - 4 * m * k)
+	r1 = math.sqrt(c ** 2 - 4 * m * k) - c
 	r1 /= (2 * m)
-	r2 = -c - math.sqrt(c ** 2 - 4 * m * k)
+	r2 = (0 - c) - math.sqrt(c ** 2 - 4 * m * k)
 	r2 /= (2 * m)
-	c2 = xd0 - (x0 - )
+	c2 = xd0 - x0 * r1
+	c2 = c2 / (r2 - r1)
 
+	c1 = x0 - c2
 
+	xt = c1 * math.exp(r1 * t) + c2 * math.exp(r2 * t)
 
+	return xt
 
 if __name__ == '__main__':
 
