@@ -28,13 +28,17 @@ def writebestpoints(x, y):
     f.write(end)
     f.close()
 
+# def sorttuple(tup):
+
+
+
 if __name__ == '__main__':
 
-    # numinst = sys.argv[1]
-    # maxrun = sys.argv[2]
-
-    numinst = 10
-    maxrun = 1000
+    numinst = sys.argv[1]
+    maxrun = sys.argv[2]
+    #
+    # numinst = 10
+    # maxrun = 1000
 
     s = Simulator(numinst)
 
@@ -45,25 +49,92 @@ if __name__ == '__main__':
 
     worstcost = s.evaluate(default)
     # print('Default cost is: ', worstcost)   # for printing out cost of diagonal path
+
     counter = 0
     coord = []
     allcosts = []
     stepsize = 20 / 33
+    xcoord = []
+    ycoord = []
 
     # get 32 X 32 mesh and 1024 coordinates
     for i in range (1,33):
         for j in range (1,33):
             x = -10 + i * stepsize
             y = -10 + j * stepsize
+            xcoord.append(x)       # store x coordinates
+            ycoord.append(y)       # store y coordinates
             coord.append([x, y])
 
-        #     # construct test tuple
-        #     test = [(-10, -10), (nextx, nexty), (10, 10)]
-        #     newcost = s.evaluate(test)
-        # # see if it's better/the best
-        #
-        # allcosts.append(newcost)
+    begin = (-10, -10)    # coord tup for start point
+    end = (10, 10)        # coord tup for end point
+    counter = 0
+    # these parameters must have a product less than 1000 by default. 
+    numtrials = 50
+    numpoints = 10
+    #
+    lowercost = []
+    goodtup = []      # list of the coordinates cheaper than the default cost
+    flag = 0          # for indicating whether there's a cheaper route found
+
+    for j in range(1,numtrials):
+        counter += 1
+
+        indexset = []
+        tuplist = [begin]
+        x1set = []
+        y1set = []
+        initial = 1
+
+        for i in range(1,numpoints):    # 10 being the default number of points
+            if initial > 1023:
+                initial = 900
+            index = random.randint(initial, initial + 300)
+            if index > 1023:
+                index = 950
+            indexset.append(index)
+            # print(index)
+            x1 = coord[index][0]
+            y1 = coord[index][1]
+            x1set.append(x1)
+            y1set.append(y1)
+
+            # make tuple
+            subtup = (x1,y1)
+            tuplist.append(subtup)
+            initial += random.randint(1,100)
+
+
+        tuplist.append(end)
+
+        newcost = s.evaluate(tuplist)
+
+        if newcost < worstcost:
+            flag = 1      # to indicate a cheaper route was found
+            # add start and end points
+            x1set.insert(0,-10)
+            x1set.append(10)
+            y1set.insert(0, -10)
+            y1set.append(10)
+
+            plt.plot(x1set, y1set)
+            plt.plot(x1set, y1set, 'ro')
+            goodtup.append(tuplist)
+            lowercost.append(newcost)
+
+        allcosts.append(newcost)
+
+        plt.plot(x1set, y1set)  # comment this out to show only cheaper paths
 
     # print('Best cost: ', bestcost)
-    print(len(coord))
-    print(coord[0])
+    # plt.plot(xcoord, ycoord, 'ro')    # prints the points
+
+    plt.grid(True)
+    plt.show()
+
+    if flag == 0:
+        print('No cheaper routes found. Try running the program again, it should be able to find something.')
+    else:
+        print('Cheaper route found!')
+        print('External program executed',counter, 'times.')
+        print('Minimum cost is', min(lowercost), ', compared to default which is', worstcost)
