@@ -4,9 +4,9 @@
 # D:\PythonScripts01\499hw3\simulator.exe waypoints 10
 
 # this script's path:
-# python D:\01PythonScripts\499hw3\scratch1.py simulator.exe waypoints 10
+# python D:\01PythonScripts\499hw3\scratch1.py
 
-import sys, os, subprocess, string
+import subprocess
 
 
 #  sys arg: [0] py script name;
@@ -24,11 +24,12 @@ class Simulator():
         # for now these ^ will be hard coded.
 
         self.exename = 'simulator.exe'
-        self.waypoint = 'waypoint1'
+        self.waypoint = 'waypoint'
 
     def evaluate(self, w):
         x = []
         y = []
+
         for i in w:
             a, b = i
             x.append(a)
@@ -66,9 +67,9 @@ if __name__ == '__main__':
 
     w = [(-10, -10), (0, 2), (10, 10)]   # list of tuples (waypoints)
 
-    s = Simulator(8)
+    s = Simulator(10)
 
-    print('numinst is: ', s.numinst)
+    # print('numinst is: ', s.numinst)
 
     print(s.evaluate(w))
 
