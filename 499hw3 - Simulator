@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+# simulator.py should add ONE SINGLE waypoint to the path
+
+# this script's path:
+# python D:\01PythonScripts\499hw3\simulator.py 10
+
+from scratch1 import Simulator
+import sys, random
+
+def writebetterpoint(x, y):
+
+    f = open('better_waypoints','w+')
+
+    begin = str(-10) + space + str(-10) + '\n'
+    end = str(10) + space + str(10) + '\n'
+    newpoint = str(x) + space + str(y) + '\n'
+
+    # construct overll string for file
+    points = begin + newpoint + end
+
+    f.write(points)
+    f.close()
+
+
+if __name__ == '__main__':
+
+    numinst = sys.argv[1]
+    # numinst = 8
+
+    s = Simulator(numinst)
+
+    better = False
+    space = ' '
+
+    default = [(-10, -10), (10, 10)]
+
+    worstcost = s.evaluate(default)
+    # print('Default cost is: ', worstcost)   # for printing out cost of diagonal path
+
+    while better == False:
+        # random numbers for the coordinates of the new waypoint
+        randi1 = random.uniform(-10, 10)
+        randi2 = random.uniform(-10, 10)
+        # construct test tuple
+        test = [(-10, -10), (randi1, randi2), (10, 10)]
+
+        newcost = s.evaluate(test)
+
+        # now see if it gets better
+        if newcost < worstcost:
+            better = True
+            print('Better waypoint: ', '(', randi1, ',', randi2, ')')
+            print('The new cost is: ', newcost)
+            writebetterpoint(randi1, randi2)
+
