@@ -1,44 +1,78 @@
 #!/usr/bin/env python3
 
 # to run the exe from commandine:
-# D:\PythonScripts\499hw3\simulator.exe waypoints 10
+# D:\PythonScripts01\499hw3\simulator.exe waypoints 10
 
 # this script's path:
-# python D:\PythonScripts\499hw3\scratch1.py simulator.exe waypoints 10
+# python D:\01PythonScripts\499hw3\scratch1.py simulator.exe waypoints 10
 
-import sys, os, subprocess
+import sys, os, subprocess, string
 
 
 #  sys arg: [0] py script name;
 
 
-class Simulator(object):
-    def __init__(self, exename = sys.argv[1], waypoints = sys.argv[2], numinst = sys.argv[3]):
+class Simulator():
+    # def __init__(self, exename = sys.argv[1], waypoints = sys.argv[2], numinst = sys.argv[3]):
+    def __init__(self, numinst):
         # [0]script name; [1]exe file name; [2]waypoints; [3]instance num
+
         self.numinst = numinst
-        self.exename = exename
-        self.waypoints = waypoints
+        # self.exename = exename
+        # self.waypoints = waypoints
 
+        # for now these ^ will be hard coded.
 
+        self.exename = 'simulator.exe'
+        self.waypoint = 'waypoint1'
 
-    # def evaluate():
+    def evaluate(self, w):
+        x = []
+        y = []
+        for i in w:
+            a, b = i
+            x.append(a)
+            y.append(b)
 
+        # update waypoints file
 
+        filename = self.waypoint  # file name for waypoints file
+        file = open(filename, 'w')
+        space = ' '
+
+        for i in range(0, len(x)):
+            coord = str(x[i]) + space + str(y[i]) + '\n'
+            file.write(coord)
+
+        file.close()
+
+        output = str(subprocess.check_output(self.exename + ' ' + self.waypoint + ' ' + str(self.numinst)))
+
+        output = output.split(' ')
+        numpt = int(output[1])
+        # print('Number of waypoints: ', numpt)
+
+        # parse the cost
+
+        cost = output[-1]  # the cost is the last element
+        cost = cost.split('.\\')  # apparently what you have to do to split by backslash
+        cost = cost[0]
+        cost = float(cost)  # now cost is a floating point
+
+        # print('The cost is: ', cost)
+        return cost
 
 if __name__ == '__main__':
 
-    simulator = Simulator()
+    w = [(-10, -10), (0, 2), (10, 10)]   # list of tuples (waypoints)
 
-    # subprocess.call(simulator.exename)
-    os.startfile(simulator.exename)
-    # use subprocess check_output
+    s = Simulator(8)
+
+    print('numinst is: ', s.numinst)
+
+    print(s.evaluate(w))
 
 
-    # print(simulator.exename)
 
-    # print(simulator.numinst)
-    #
-    # w = [(-10, -10), (0, 2), (10, 10)]   # list of tuples (waypoints)
-    # s = Simulator(10)
 
 
