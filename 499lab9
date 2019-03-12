@@ -1,1 +1,224 @@
 #!/usr/bin/env python3
+
+# what is the initial condition???
+# also is this thing supposed to be able to handle overdamping???
+
+# this script: python D:\PythonScripts\499lab9\smd-gui.py
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QSlider, QLabel, QGroupBox
+from PyQt5.QtCore import Qt
+
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+
+import math
+import matplotlib.pyplot as plt
+
+
+class SpringMassDamperGUI(QMainWindow):
+	def __init__(self):
+		QMainWindow.__init__(self)
+		self.setWindowTitle('Spring-Mass-Damper Playgound')
+
+		# Control buttons for the interface
+		quit_button = QPushButton('Quit')
+		quit_button.clicked.connect(app.exit)
+
+		simulate_button = QPushButton('Simulate\nSystem')
+		simulate_button.clicked.connect(self.simulate)
+
+		# The display for the graph
+		self.figure = Figure()
+		self.display = FigureCanvas(self.figure)
+		self.draw()
+
+		# SLIDER; The parameters of the system we're simulating; sliders for MKC
+		parameters = QGroupBox('System parameters')
+		parameter_layout = QVBoxLayout()   # vertical layout for sliders
+		self.m = SliderDisplay('Mass', 0, 10)
+		self.k = SliderDisplay('Spring', 0, 10)
+		self.c = SliderDisplay('Damper', 0, 10)
+		parameter_layout.addWidget(self.m)
+		parameter_layout.addWidget(self.k)
+		parameter_layout.addWidget(self.c)
+		parameters.setLayout(parameter_layout)
+
+
+		# initial conditions
+		self.IC = [2,3]
+		self.x0 = self.IC[0]
+		self.x0dot = self.IC[1]
+
+
+		# BOX: system behaviour
+		behaviour = QGroupBox('System Behaviour')
+		behaviour_layout = QVBoxLayout()
+		self.behaviourtext = QLabel()
+		# self.behaviourtext.setText('stuff')
+		behaviour_layout.addWidget(self.behaviourtext)
+		behaviour.setLayout(behaviour_layout)
+
+
+		# SLIDER; The parameters of the simulation themselves; Time Interval and Step Size
+		system = QGroupBox('Simulation parameters')
+		system_layout = QVBoxLayout()
+		self.t = SliderDisplay('Time (s)', 0, 100)
+		self.dt = SliderDisplay('Time step (s)', 0.001, 0.1)
+		system_layout.addWidget(self.t)
+		system_layout.addWidget(self.dt)
+		system.setLayout(system_layout)
+
+		# FORMATTING; The layout of the interface
+		widget = QWidget()
+		self.setCentralWidget(widget)
+
+		top_level_layout = QHBoxLayout()
+		widget.setLayout(top_level_layout)
+		left_side_layout = QVBoxLayout()
+
+		left_side_layout.addWidget(parameters)
+		left_side_layout.addWidget(behaviour)
+		left_side_layout.addWidget(system)
+		left_side_layout.addWidget(simulate_button)
+		left_side_layout.addStretch()
+		left_side_layout.addWidget(quit_button)
+		
+		top_level_layout.addLayout(left_side_layout)
+		top_level_layout.addWidget(self.display)
+
+		# additional parameters
+		self.zeta = None  # by default
+
+
+# THIS IS THE PART THAT NEEDS UPDATE
+
+	def simulate(self):
+		# from random import random
+		# self.draw([random() for i in range(25)])
+		line = []
+		time = 0
+		k = self.k.value()
+		m = self.m.value()
+		c = self.c.value()
+		dt = self.dt.value()
+		duration = self.t.value()
+
+		# misc parameters
+		wn = math.sqrt(k/m)
+		zeta = c / (2 * math.sqrt(m * k))
+		wd = wn * math.sqrt(1 - zeta**2)
+
+		# update zeta accordingly
+
+		self.zeta = zeta
+		#
+		# if self.zeta > 1:
+		# 	print('System is overdamped, Self Desctruction sequence initiated')
+		# 	raise ValueError
+
+
+		# construct line
+		if self.zeta < 1:
+			for i in range(0, math.ceil(duration/dt)):
+				time += dt
+				disp = (self.x0dot + zeta * wn * self.x0) / wd
+				disp = disp * math.sin(wd * time)
+				disp = disp + self.x0 * math.cos(wd * time)
+				disp = disp * math.exp(-zeta * wn * time)
+
+				line.append(disp)
+		elif zeta >= 1:
+			c1, c2, r1, r2 = overdampedsoln(self.m, self.c, self.k, self.zeta, self.IC)
+
+
+		self.draw(line)
+
+	def draw(self, data=None):
+		self.figure.clear()
+
+		if data:
+			ax = self.figure.add_subplot(111)
+			ax.plot(data)
+			if self.zeta == 1:
+				damptype = 'Critically Damped'
+
+			elif self.zeta > 1:
+				damptype = 'Overdamped'
+			elif self.zeta < 1 and self.zeta > 0:
+				damptype = 'Underdamped'
+			else: # if zeta < 0
+				damptype = 'Undamped'
+
+			self.behaviourtext.setText(damptype)
+
+			title = 'Spring-Mass-Damper System Behavior\nk = {0:.3f}, m = {1:.3f}, c = {2:.3f}, dt = {3:.3f}\n' .format(self.k.value(), self.m.value(), self.c.value(), self.dt.value()) + damptype
+			ax.set_title(title)
+			# ax.set_title('Spring-Mass-Damper System Behavior\nk = {0:.3f}, m = {1:.3f}, c = {2:.3f}, dt = {3:.3f}\nstuff'.format(self.k.value(), self.m.value(), self.c.value(), self.dt.value()))
+			ax.set_xlabel('Time (s)')
+			ax.set_ylabel('Amplitude')
+			self.display.draw()
+
+
+class SliderDisplay(QWidget):
+	def __init__(self, name, low, high, ticks=1000):
+		QWidget.__init__(self)
+
+		self.name = name
+		self.low = low
+		self.range = high - low
+		self.ticks = ticks
+
+		# Horizontal layout
+		layout = QHBoxLayout()
+		self.setLayout(layout)
+
+		self.slider = QSlider(Qt.Horizontal)
+		self.slider.setMinimum(0)
+		self.slider.setMaximum(ticks)
+		self.slider.valueChanged.connect(self.set_value)
+
+		self.display = QLabel()
+		self.set_value()
+
+		layout.addWidget(self.display)
+		layout.addWidget(self.slider)
+
+	def value(self):
+		return (self.slider.value() / self.ticks) * self.range + self.low
+
+	def set_value(self):
+		self.display.setText('{0}: {1:.3f}'.format(self.name, self.value()))
+
+
+class GraphingDisplay(FigureCanvas):
+	def __init__(self):
+		self.figure = Figure()
+		FigureCanvas.__init__(self, self.figure)
+
+	def clear(self):
+		self.figure.clear()
+
+	def figure(self):
+		return self.add_subplot(111)
+
+
+def overdampedsoln(m, c, k, zeta, IC):
+	x0 = IC[0]
+	xd0 = IC[1]
+	r1 = -c + math.sqrt(c ** 2 - 4 * m * k)
+	r1 /= (2 * m)
+	r2 = -c - math.sqrt(c ** 2 - 4 * m * k)
+	r2 /= (2 * m)
+	c2 = xd0 - (x0 - )
+
+
+
+
+if __name__ == '__main__':
+
+	app = QApplication([])
+
+	gui = SpringMassDamperGUI()
+
+	gui.show()
+
+	app.exec_()
