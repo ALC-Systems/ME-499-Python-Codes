@@ -13,19 +13,21 @@
 from scratch1 import Simulator
 import sys, matplotlib.pyplot as plt, random, math
 
-def writebestpoints(x, y):
+def writebestpoints(besttup):
+    x = []
+    y = []
+
+    for i in besttup:
+        a, b = i
+        x.append(a)
+        y.append(b)
 
     f = open('best_waypoints','w+')
 
-    begin = str(-10) + space + str(-10) + '\n'
-    end = str(10) + space + str(10) + '\n'
-
-    f.write(begin)
     for i in range(0, len(x)):
         newpoint = str(x[i]) + space + str(y[i]) + '\n'
         f.write(newpoint)
 
-    f.write(end)
     f.close()
 
 # def sorttuple(tup):
@@ -140,3 +142,6 @@ if __name__ == '__main__':
         print('Cheaper route found!')
         print('External program executed',counter, 'times.')
         print('Best path cost is', min(lowercost), ', compared to default which is', worstcost)
+
+        bestind = lowercost.index(min(lowercost))
+        writebestpoints(goodtup[bestind])
