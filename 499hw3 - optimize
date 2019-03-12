@@ -11,7 +11,7 @@
 
 
 from scratch1 import Simulator
-import sys, matplotlib.pyplot as plt, random
+import sys, matplotlib.pyplot as plt, random, math
 
 def writebestpoints(x, y):
 
@@ -34,8 +34,8 @@ def writebestpoints(x, y):
 
 if __name__ == '__main__':
 
-    numinst = sys.argv[1]
-    maxrun = sys.argv[2]
+    numinst = int(sys.argv[1])
+    maxrun = int(sys.argv[2])
     #
     # numinst = 10
     # maxrun = 1000
@@ -69,9 +69,10 @@ if __name__ == '__main__':
     begin = (-10, -10)    # coord tup for start point
     end = (10, 10)        # coord tup for end point
     counter = 0
-    # these parameters must have a product less than 1000 by default. 
-    numtrials = 50
-    numpoints = 10
+    # these parameters must have a product less than 1000 by default.
+    numtrials = math.ceil(maxrun/20)
+    numpoints = 5
+    # numpoints = math.ceil(maxrun/200)
     #
     lowercost = []
     goodtup = []      # list of the coordinates cheaper than the default cost
@@ -87,9 +88,10 @@ if __name__ == '__main__':
         initial = 1
 
         for i in range(1,numpoints):    # 10 being the default number of points
-            if initial > 1023:
-                initial = 900
-            index = random.randint(initial, initial + 300)
+            if initial > maxrun:
+                initial = math.ceil(1024 * 0.85)
+
+            index = random.randint(initial, initial + math.ceil(1024 / 3))
             if index > 1023:
                 index = 950
             indexset.append(index)
@@ -102,7 +104,7 @@ if __name__ == '__main__':
             # make tuple
             subtup = (x1,y1)
             tuplist.append(subtup)
-            initial += random.randint(1,100)
+            initial += random.randint(1,math.ceil(1024/ 4))  # this isn't affected by numrun
 
 
         tuplist.append(end)
@@ -133,8 +135,8 @@ if __name__ == '__main__':
     plt.show()
 
     if flag == 0:
-        print('No cheaper routes found. Try running the program again, it should be able to find something.')
+        print('No cheaper routes found this time. Try running the program again, it should be able to find something.')
     else:
         print('Cheaper route found!')
         print('External program executed',counter, 'times.')
-        print('Minimum cost is', min(lowercost), ', compared to default which is', worstcost)
+        print('Best path cost is', min(lowercost), ', compared to default which is', worstcost)
