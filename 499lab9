@@ -43,13 +43,6 @@ class SpringMassDamperGUI(QMainWindow):
 		parameter_layout.addWidget(self.c)
 		parameters.setLayout(parameter_layout)
 
-
-		# initial conditions
-		self.IC = [2,3]
-		self.x0 = self.IC[0]
-		self.x0dot = self.IC[1]
-
-
 		# BOX: system behaviour
 		behaviour = QGroupBox('System Behaviour')
 		behaviour_layout = QVBoxLayout()
@@ -64,9 +57,20 @@ class SpringMassDamperGUI(QMainWindow):
 		system_layout = QVBoxLayout()
 		self.t = SliderDisplay('Time (s)', 0, 100)
 		self.dt = SliderDisplay('Time step (s)', 0.001, 0.1)
-		# self.x0 = SliderDisplay()
+		self.x0 = SliderDisplay('Initial Position', -10, 10)
+		self.x0dot = SliderDisplay('Initial Velocity', -10, 10)
+		#
+		# # initial conditions
+		# self.IC = [self.x0,3]
+		# self.x0 = self.IC[0]
+		# self.x0dot = self.IC[1]
+		self.IC = [self.x0, self.x0dot]
+
 		system_layout.addWidget(self.t)
 		system_layout.addWidget(self.dt)
+		system_layout.addWidget(self.x0)
+		system_layout.addWidget(self.x0dot)
+
 		system.setLayout(system_layout)
 
 		# FORMATTING; The layout of the interface
@@ -104,6 +108,9 @@ class SpringMassDamperGUI(QMainWindow):
 		dt = self.dt.value()
 		duration = self.t.value()
 
+		x0 = self.x0.value()
+		x0dot = self.x0dot.value()
+
 		# misc parameters
 		wn = math.sqrt(k/m)
 		zeta = c / (2 * math.sqrt(m * k))
@@ -123,9 +130,9 @@ class SpringMassDamperGUI(QMainWindow):
 			for i in range(0, math.ceil(duration/dt)):
 				time += dt
 
-				disp = (self.x0dot + zeta * wn * self.x0) / wd
+				disp = (x0dot + zeta * wn * x0) / wd
 				disp = disp * math.sin(wd * time)
-				disp = disp + self.x0 * math.cos(wd * time)
+				disp = disp + x0 * math.cos(wd * time)
 				disp = disp * math.exp(-zeta * wn * time)
 
 				line.append(disp)
@@ -133,13 +140,12 @@ class SpringMassDamperGUI(QMainWindow):
 		elif zeta >= 1:
 			for i in range(0, math.ceil(duration / dt)):
 				time += dt
-				x0 = self.IC[0]
-				xd0 = self.IC[1]
+
 				r1 = math.sqrt(c ** 2 - 4 * m * k) - c
 				r1 /= (2 * m)
 				r2 = (0 - c) - math.sqrt(c ** 2 - 4 * m * k)
 				r2 /= (2 * m)
-				c2 = xd0 - x0 * r1
+				c2 = x0dot - x0 * r1
 				c2 = c2 / (r2 - r1)
 
 				c1 = x0 - c2
