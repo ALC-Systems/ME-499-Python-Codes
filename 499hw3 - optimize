@@ -1,0 +1,69 @@
+#!/usr/bin/env python3
+# optimize.py should add a bunch of points to the path
+
+# this script's path:
+# python D:\01PythonScripts\499hw3\optimize.py 10 1000
+
+############# questions ###########
+# 1. so the map stays the same (20 X 20) but different instances have different
+# radiation hotspots?
+# 2. Do the coordinates have to be integers or floats?
+
+
+from scratch1 import Simulator
+import sys, matplotlib.pyplot as plt, random
+
+def writebestpoints(x, y):
+
+    f = open('best_waypoints','w+')
+
+    begin = str(-10) + space + str(-10) + '\n'
+    end = str(10) + space + str(10) + '\n'
+
+    f.write(begin)
+    for i in range(0, len(x)):
+        newpoint = str(x[i]) + space + str(y[i]) + '\n'
+        f.write(newpoint)
+
+    f.write(end)
+    f.close()
+
+if __name__ == '__main__':
+
+    # numinst = sys.argv[1]
+    # maxrun = sys.argv[2]
+
+    numinst = 10
+    maxrun = 1000
+
+    s = Simulator(numinst)
+
+    best = False
+    space = ' '
+
+    default = [(-10, -10), (10, 10)]
+
+    worstcost = s.evaluate(default)
+    # print('Default cost is: ', worstcost)   # for printing out cost of diagonal path
+    counter = 0
+    coord = []
+    allcosts = []
+    stepsize = 20 / 33
+
+    # get 32 X 32 mesh and 1024 coordinates
+    for i in range (1,33):
+        for j in range (1,33):
+            x = -10 + i * stepsize
+            y = -10 + j * stepsize
+            coord.append([x, y])
+
+        #     # construct test tuple
+        #     test = [(-10, -10), (nextx, nexty), (10, 10)]
+        #     newcost = s.evaluate(test)
+        # # see if it's better/the best
+        #
+        # allcosts.append(newcost)
+
+    # print('Best cost: ', bestcost)
+    print(len(coord))
+    print(coord[0])
